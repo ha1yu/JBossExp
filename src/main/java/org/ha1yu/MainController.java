@@ -15,7 +15,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -360,30 +360,53 @@ public class MainController {
 
             for (int i = 0; i < this.urlList.size(); ++i) {
                 String url = (String) this.urlList.get(i);
-                BatchCheckTask batchCheckTask = new BatchCheckTask(i + 1, this.currentVulIndex, url);
-                exec.execute(batchCheckTask);
-                this.batch_tableView.getItems().addAll(new BatchCheckTask[]{batchCheckTask});
-                batchCheckTask.setOnSucceeded((event1) -> {
-                    ++this.batch_job_count;
-                    if (this.batch_job_count == this.urlList.size()) {
-                        this.jobDone();
-                    }
+                // Check one
+                //BatchCheckTask batchCheckTask = new BatchCheckTask(i + 1, this.currentVulIndex, url);
 
-                });
-                batchCheckTask.setOnCancelled((event12) -> {
-                    ++this.batch_job_count;
-                    if (this.batch_job_count == this.urlList.size()) {
-                        this.jobDone();
-                    }
+                // check all vuls
+                List<BatchCheckTask> que = new ArrayList<>();
+                BatchCheckTask batchCheckTask1 = new BatchCheckTask(i + 1, 0, url);
+                BatchCheckTask batchCheckTask2 = new BatchCheckTask(i + 1, 1, url);
+                BatchCheckTask batchCheckTask3 = new BatchCheckTask(i + 1, 2, url);
+                BatchCheckTask batchCheckTask4 = new BatchCheckTask(i + 1, 3, url);
+                BatchCheckTask batchCheckTask5 = new BatchCheckTask(i + 1, 4, url);
+                BatchCheckTask batchCheckTask6 = new BatchCheckTask(i + 1, 5, url);
+                BatchCheckTask batchCheckTask7 = new BatchCheckTask(i + 1, 6, url);
+                BatchCheckTask batchCheckTask8 = new BatchCheckTask(i + 1, 7, url);
+                que.add(batchCheckTask1);
+                que.add(batchCheckTask2);
+                que.add(batchCheckTask3);
+                que.add(batchCheckTask4);
+                que.add(batchCheckTask5);
+                que.add(batchCheckTask6);
+                que.add(batchCheckTask7);
+                que.add(batchCheckTask8);
+                for (int y = 0; y < que.size(); ++y) {
+                    BatchCheckTask batchCheckTask = que.get(y);
+                    exec.execute(batchCheckTask);
+                    this.batch_tableView.getItems().addAll(new BatchCheckTask[]{batchCheckTask});
+                    batchCheckTask.setOnSucceeded((event1) -> {
+                        ++this.batch_job_count;
+                        if (this.batch_job_count == this.urlList.size()) {
+                            this.jobDone();
+                        }
 
-                });
-                batchCheckTask.setOnFailed((event13) -> {
-                    ++this.batch_job_count;
-                    if (this.batch_job_count == this.urlList.size()) {
-                        this.jobDone();
-                    }
+                    });
+                    batchCheckTask.setOnCancelled((event12) -> {
+                        ++this.batch_job_count;
+                        if (this.batch_job_count == this.urlList.size()) {
+                            this.jobDone();
+                        }
 
-                });
+                    });
+                    batchCheckTask.setOnFailed((event13) -> {
+                        ++this.batch_job_count;
+                        if (this.batch_job_count == this.urlList.size()) {
+                            this.jobDone();
+                        }
+
+                    });
+                }
             }
         }
 
