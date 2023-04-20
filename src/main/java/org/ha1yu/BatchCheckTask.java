@@ -1,6 +1,5 @@
 package org.ha1yu;
 
-import org.ha1yu.UtilMethod;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 

@@ -1,32 +1,11 @@
 package org.ha1yu;
 
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import com.jbossexp.*;
-import com.jbossexp.BatchCheckTask;
-import com.jbossexp.CheckTask;
-import com.jbossexp.CommandTask;
-import com.jbossexp.Config;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
@@ -34,6 +13,11 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainController {
     @FXML
@@ -73,13 +57,13 @@ public class MainController {
     @FXML
     private Button batch_stopBtn;
     @FXML
-    private TableView<com.jbossexp.BatchCheckTask> batch_tableView;
+    private TableView<BatchCheckTask> batch_tableView;
     @FXML
-    private TableColumn<com.jbossexp.BatchCheckTask, Integer> batch_tableColumnIndex;
+    private TableColumn<BatchCheckTask, Integer> batch_tableColumnIndex;
     @FXML
-    private TableColumn<com.jbossexp.BatchCheckTask, String> batch_tableColumnUrl;
+    private TableColumn<BatchCheckTask, String> batch_tableColumnUrl;
     @FXML
-    private TableColumn<com.jbossexp.BatchCheckTask, String> batch_tableColumnResult;
+    private TableColumn<BatchCheckTask, String> batch_tableColumnResult;
     @FXML
     private Button batch_saveBtn;
     @FXML
@@ -111,7 +95,7 @@ public class MainController {
     @FXML
     private TextArea upload_result_textArea;
     private String upload_result;
-    private com.jbossexp.Config config;
+    private Config config;
     @FXML
     private CheckBox config_isProxy_checkBox;
     @FXML
@@ -283,7 +267,7 @@ public class MainController {
                 this.target_Result_textArea.appendText(targetUrl + "的检测结果如下：\n");
 
                 for (int i = 0; i < bugSize; ++i) {
-                    com.jbossexp.CheckTask checkTask = new CheckTask(i, targetUrl);
+                    CheckTask checkTask = new CheckTask(i, targetUrl);
                     checkTask.messageProperty().addListener((observable, oldValue, newValue) -> {
                         this.target_Result_textArea.appendText(newValue + "\n");
                     });
@@ -299,15 +283,15 @@ public class MainController {
         this.batch_tableColumnUrl.setCellValueFactory(new PropertyValueFactory("url"));
         this.batch_tableColumnResult.setCellValueFactory(new PropertyValueFactory("result"));
         this.batch_tableView.setRowFactory((param) -> {
-            TableRow<com.jbossexp.BatchCheckTask> row = new TableRow();
+            TableRow<BatchCheckTask> row = new TableRow();
             row.setOnMouseClicked((event) -> {
                 if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                    this.url_textField.setText(((com.jbossexp.BatchCheckTask) row.getItem()).getUrl());
+                    this.url_textField.setText(((BatchCheckTask) row.getItem()).getUrl());
                     this.uploadJarFlag = false;
                 } else if (!row.isEmpty() && event.getButton() == MouseButton.SECONDARY && event.getClickCount() == 1) {
                     Clipboard clipboard = Clipboard.getSystemClipboard();
                     ClipboardContent content = new ClipboardContent();
-                    content.putString(((com.jbossexp.BatchCheckTask) row.getItem()).getUrl());
+                    content.putString(((BatchCheckTask) row.getItem()).getUrl());
                     clipboard.setContent(content);
                 }
 
@@ -339,7 +323,7 @@ public class MainController {
             String filePath = chosenDir.getAbsolutePath();
             this.batch_path.setText(filePath);
             this.urlList = MainMethod.readFile(filePath);
-            ObservableList<com.jbossexp.BatchCheckTask> list = FXCollections.observableArrayList();
+            ObservableList<BatchCheckTask> list = FXCollections.observableArrayList();
             if (this.urlList.size() > 0) {
                 this.batch_startBtn.setDisable(false);
                 this.batch_stopBtn.setDisable(true);
@@ -348,7 +332,7 @@ public class MainController {
             }
 
             for (int i = 0; i < this.urlList.size(); ++i) {
-                com.jbossexp.BatchCheckTask batchCheckTask = new com.jbossexp.BatchCheckTask(i + 1, (String) this.urlList.get(i));
+                BatchCheckTask batchCheckTask = new BatchCheckTask(i + 1, (String) this.urlList.get(i));
                 list.add(batchCheckTask);
             }
 
@@ -376,9 +360,9 @@ public class MainController {
 
             for (int i = 0; i < this.urlList.size(); ++i) {
                 String url = (String) this.urlList.get(i);
-                com.jbossexp.BatchCheckTask batchCheckTask = new com.jbossexp.BatchCheckTask(i + 1, this.currentVulIndex, url);
+                BatchCheckTask batchCheckTask = new BatchCheckTask(i + 1, this.currentVulIndex, url);
                 exec.execute(batchCheckTask);
-                this.batch_tableView.getItems().addAll(new com.jbossexp.BatchCheckTask[]{batchCheckTask});
+                this.batch_tableView.getItems().addAll(new BatchCheckTask[]{batchCheckTask});
                 batchCheckTask.setOnSucceeded((event1) -> {
                     ++this.batch_job_count;
                     if (this.batch_job_count == this.urlList.size()) {
@@ -436,7 +420,7 @@ public class MainController {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < this.batch_tableView.getItems().size(); ++i) {
-            com.jbossexp.BatchCheckTask batchCheckTask = (BatchCheckTask) this.batch_tableView.getItems().get(i);
+            BatchCheckTask batchCheckTask = (BatchCheckTask) this.batch_tableView.getItems().get(i);
             sb.append(batchCheckTask.getIndex());
             sb.append("\t\t");
             sb.append(batchCheckTask.getUrl());
@@ -467,7 +451,7 @@ public class MainController {
     private void commandBtnStart() {
         String url = this.url_textField.getText().trim();
         String cmd = this.command_TextField.getText().trim();
-        com.jbossexp.CommandTask commandTask = new CommandTask(this.currentVulIndex, url, cmd, this.uploadJarFlag);
+        CommandTask commandTask = new CommandTask(this.currentVulIndex, url, cmd, this.uploadJarFlag);
         this.uploadJarFlag = true;
         commandTask.messageProperty().addListener((observable, oldValue, newValue) -> {
             this.command_result_textArea.appendText(cmd);

