@@ -317,7 +317,7 @@ public class MainController {
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(file);
         chooser.setTitle("选择");
-        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter[]{new FileChooser.ExtensionFilter("txt文本文件", new String[]{"*.txt"})});
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("txt文本文件", "*.txt"));
         File chosenDir = chooser.showOpenDialog((Window) null);
         if (chosenDir != null) {
             String filePath = chosenDir.getAbsolutePath();
@@ -359,7 +359,7 @@ public class MainController {
             });
 
             for (int i = 0; i < this.urlList.size(); ++i) {
-                String url = (String) this.urlList.get(i);
+                String url = this.urlList.get(i);
                 // Check one
                 //BatchCheckTask batchCheckTask = new BatchCheckTask(i + 1, this.currentVulIndex, url);
 
@@ -384,7 +384,7 @@ public class MainController {
                 for (int y = 0; y < que.size(); ++y) {
                     BatchCheckTask batchCheckTask = que.get(y);
                     exec.execute(batchCheckTask);
-                    this.batch_tableView.getItems().addAll(new BatchCheckTask[]{batchCheckTask});
+                    this.batch_tableView.getItems().addAll(batchCheckTask);
                     batchCheckTask.setOnSucceeded((event1) -> {
                         ++this.batch_job_count;
                         if (this.batch_job_count == this.urlList.size()) {
@@ -472,15 +472,20 @@ public class MainController {
 
     @FXML
     private void commandBtnStart() {
+//        System.out.println("执行命令->执行按钮");
         String url = this.url_textField.getText().trim();
         String cmd = this.command_TextField.getText().trim();
+//        System.out.println("url:" + url);
+//        System.out.println("cmd:" + cmd);
+//        System.out.println("this.currentVulIndex:" + this.currentVulIndex);
+//        System.out.println("this.uploadJarFlag:" + this.uploadJarFlag);
         CommandTask commandTask = new CommandTask(this.currentVulIndex, url, cmd, this.uploadJarFlag);
         this.uploadJarFlag = true;
         commandTask.messageProperty().addListener((observable, oldValue, newValue) -> {
-            this.command_result_textArea.appendText(cmd);
+            this.command_result_textArea.appendText("【" + cmd + "】");
             this.command_result_textArea.appendText("\n");
             this.command_result_textArea.appendText(newValue + "\n");
-            this.command_result_textArea.appendText("=======================================================================================\n");
+            this.command_result_textArea.appendText("-------------------------------------\n");
         });
         (new Thread(commandTask)).start();
     }
