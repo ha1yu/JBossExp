@@ -322,7 +322,14 @@ public class MainController {
         if (chosenDir != null) {
             String filePath = chosenDir.getAbsolutePath();
             this.batch_path.setText(filePath);
-            this.urlList = MainMethod.readFile(filePath);
+            List<String> urlList = MainMethod.readFile(filePath);
+            for (int i = 0; i < urlList.size(); i++) {
+                if (!urlList.get(i).contains("http") && !urlList.get(i).contains("https")) {
+                    urlList.set(i, "http://" + urlList.get(i));
+                }
+            }
+            System.out.println(urlList);
+            this.urlList = urlList;
             ObservableList<BatchCheckTask> list = FXCollections.observableArrayList();
             if (this.urlList.size() > 0) {
                 this.batch_startBtn.setDisable(false);
