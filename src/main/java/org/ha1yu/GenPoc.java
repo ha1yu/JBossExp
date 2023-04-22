@@ -156,10 +156,10 @@ public class GenPoc {
     }
 
     public static String getCommandResult(byte[] response) throws UnsupportedEncodingException {
+        String returnValue = "";
         String resultTmp = new String(response, "UTF-8");
         int x1 = resultTmp.indexOf("==========") + 10;
         int x2 = resultTmp.lastIndexOf("==========") - 1;
-        String returnValue = "";
         if (x1 >= 0 && x2 >= 0) {
             returnValue = resultTmp.substring(x1, x2).trim();
         } else {
@@ -167,7 +167,6 @@ public class GenPoc {
 //            returnValue = resultTmp;
             returnValue = "未找到命令执行结果，命令可能执行失败！";
         }
-
         return returnValue;
     }
 }
