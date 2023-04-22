@@ -149,10 +149,9 @@ public class MainMethod {
         try {
             HttpResponse response = httpClient.execute(httpPost);
             result = EntityUtils.toByteArray(response.getEntity());
-        } catch (IOException var7) {
-            var7.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-
         return result;
     }
 
