@@ -30,8 +30,8 @@
                                 <TableView fx:id="batch_tableView" layoutX="11.0" layoutY="52.0" prefHeight="378.0" prefWidth="770.0">
                                     <columns>
                                         <TableColumn fx:id="batch_tableColumnIndex" prefWidth="75.0" text="id" />
-                                        <TableColumn fx:id="batch_tableColumnUrl" prefWidth="425.0" text="URL" />
-                                        <TableColumn fx:id="batch_tableColumnResult" editable="false" prefWidth="250.0" text="是否存在漏洞" />
+                                        <TableColumn fx:id="batch_tableColumnUrl" prefWidth="300.0" text="URL" />
+                                        <TableColumn fx:id="batch_tableColumnResult" editable="false" prefWidth="375.0" text="是否存在漏洞" />
                                     </columns>
                                 </TableView>
                                 <Label layoutX="25.0" layoutY="14.0" prefHeight="20.0" prefWidth="75.0" text="文件地址：" />
