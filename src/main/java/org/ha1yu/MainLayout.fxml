@@ -7,7 +7,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ha1yu.MainController">
     <children>
         <Label layoutX="30.0" layoutY="30.0" text="网址：" />
-        <TextField fx:id="url_textField" layoutX="96.0" layoutY="25.0" prefHeight="30.0" prefWidth="348.0" text="http://87.215.7.126" />
+        <TextField fx:id="url_textField" layoutX="96.0" layoutY="25.0" prefHeight="30.0" prefWidth="348.0" text="http://10.10.10.10:8888" />
         <Label layoutX="526.0" layoutY="32.0" text="漏洞编号：" />
         <ChoiceBox fx:id="bug_choiceBox" layoutX="628.0" layoutY="26.0" prefHeight="30.0" prefWidth="158.0" />
         <TabPane fx:id="tabPane" layoutX="2.0" layoutY="82.0" prefHeight="507.0" prefWidth="788.0" tabClosingPolicy="UNAVAILABLE">
