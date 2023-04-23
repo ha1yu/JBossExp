@@ -450,7 +450,7 @@ public class MainController {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < this.batch_tableView.getItems().size(); ++i) {
-            BatchCheckTask batchCheckTask = (BatchCheckTask) this.batch_tableView.getItems().get(i);
+            BatchCheckTask batchCheckTask = this.batch_tableView.getItems().get(i);
             sb.append(batchCheckTask.getIndex());
             sb.append("\t\t");
             sb.append(batchCheckTask.getUrl());
@@ -465,6 +465,7 @@ public class MainController {
         }
 
         UtilMethod.writeResult(path, sb.toString(), true);
+        this.showAlert(AlertType.INFORMATION, "提示", "保存成功：" + path);
     }
 
     @FXML
