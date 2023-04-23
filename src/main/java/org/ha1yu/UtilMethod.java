@@ -253,10 +253,10 @@ public class UtilMethod {
                 break;
             case 3:
                 String str3 = UtilMethod.commandExploit(3, targetUrl, "echo xxx", false);
-                if (str3.contains("未找到命令执行结果，命令可能执行失败！")) {
+                if (str3.contains("未找到命令执行结果，命令可能执行失败！")||str3.contains("命令执行失败")) {
                     result = "未找到命令执行结果，命令可能执行失败！";
                 } else {
-                    result = "存在" + Utils.bugs_mainTab[3] + "漏洞";
+                    result = "存在" + Utils.bugs_mainTab[3] + "漏洞" + "【echo xxx：" + str3 + "】";
                 }
                 break;
             case 4:
